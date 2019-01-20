@@ -7,18 +7,11 @@ public class MainLogic : MonoBehaviour {
 	//A list of all controllable items that need to be stepped when appropriate
 	public List<Controllable> controllables = new List<Controllable>();
 
+	//The editor logic
+	public EditorLogic editorLogic;
+
 	//This is a flag used to stop execution and not perform the next step
 	private bool halt = false;
-
-	// Start is called before the first frame update
-	void Start() {
-
-	}
-
-	// Update is called once per frame
-	void Update() {
-
-	}
 
 	//Gets all controllables ready to execute
 	public void GetReadyToExecute() {
@@ -32,9 +25,12 @@ public class MainLogic : MonoBehaviour {
 	//Beings playing the code for the entire battlefield
 	public void Play() {
 
-		while( !halt ) {
-			StartCoroutine( PlayRoutine() );
-		}
+		StartCoroutine( PlayRoutine() );
+
+		
+
+		//Switch to edit mode
+		editorLogic.SwitchToEditMode();
 
 	}
 
@@ -42,17 +38,26 @@ public class MainLogic : MonoBehaviour {
 	//This is where steps are actually taken
 	public IEnumerator PlayRoutine() {
 
-		//Step every controllable
-		StepAll();
+		int loopCount = 0;
 
-		yield return new WaitForSeconds( 1 );
+		while( !halt || loopCount >= 100 ) {
+			//Step every controllable
+			StepAll();
+
+			loopCount++;
+
+			yield return new WaitForSeconds( 0.1f );
+
+		}
+		
 	}
 
 	//Loops through all controllables and steps them
 	public void StepAll() {
 		//Loop through every controllable
 		foreach( Controllable controllable in controllables ) {
-			//Step it
+			
+		//Step it
 			bool hadProblem = controllable.Step();
 
 			//If there was a halting problem in the controllable, halt
@@ -60,6 +65,7 @@ public class MainLogic : MonoBehaviour {
 				halt = true;
 				break;
 			}
+
 		}
 	}
 

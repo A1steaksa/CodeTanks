@@ -31,9 +31,9 @@ public class EditorLogic : MonoBehaviour {
 		execButton.onClick.AddListener( ExecButtonHandler );
 		playButton.onClick.AddListener( PlayButtonHandler );
 
-		//Disable the step button
+		//Disable the step and play buttons
 		stepButton.interactable = false;
-
+		playButton.interactable = false;
 	}
 
 	//Saves the code from the editor to the device
@@ -41,15 +41,12 @@ public class EditorLogic : MonoBehaviour {
 		currentDevice.SetCode( codeArea.text );
 	}
 
-    public void StepButtonHandler() {
-		//Step the device
-		currentDevice.Step();
-	}
-
 	//Prepares the editor to edit code
 	public void SwitchToEditMode() {
-		//Disable the step button
+
+		//Disable the running code
 		stepButton.interactable = false;
+		playButton.interactable = false;
 
 		//Enable editing code
 		codeArea.interactable = true;
@@ -72,14 +69,20 @@ public class EditorLogic : MonoBehaviour {
 		//Tell main logic to get ready to execute
 		mainLogic.GetReadyToExecute();
 
-		//Enable the step button
+		//Enable executing code
 		stepButton.interactable = true;
+		playButton.interactable = true;
 
 		//Switch to a stop execution button
 		execButtonIsStop = true;
 
 		//Change button text
 		execButton.GetComponentInChildren<Text>().text = "Stop";
+	}
+
+	public void StepButtonHandler() {
+		//Ask the main logic to step everybody
+		mainLogic.StepAll();
 	}
 
 	public void ExecButtonHandler() {
@@ -93,6 +96,9 @@ public class EditorLogic : MonoBehaviour {
 	}
 
 	public void PlayButtonHandler() {
+
+		//Switch to execution mode
+		SwitchToExecutionMode();
 
 		//Being playing the code on main game logic
 		mainLogic.Play();

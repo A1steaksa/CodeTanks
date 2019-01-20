@@ -92,8 +92,6 @@ public abstract class Controllable : MonoBehaviour {
 						//Save the label in the labels dictionary
 						labels.Add( line, i );
 
-						Debug.Log( "Added label " + line + " at line " + i  );
-
 					} else {
 
 						//If it ends with a ":" but is only numbers, it's probably a very poorly made label
@@ -471,8 +469,6 @@ public abstract class Controllable : MonoBehaviour {
 				//Get the line number of label A
 				valueA = GetLabelLineNumber( args[1] );
 
-				Debug.Log( "Jumping to line " + valueA );
-
 				//Move the program counter to the label's line number
 				SetRegisterValue( "PC", valueA );
 
@@ -511,12 +507,12 @@ public abstract class Controllable : MonoBehaviour {
 
 		//If we couldn't execute the line, it must have been an invalid opcode
 		if( !executed ) {
-			Error( "Invalid opcode found!" );
+			Error( "Invalid opcode " + splitLine[0] + " found at line #" +  lineNumber +"!" );
 		}
 	}
 
 	//Executes the current line and steps forward
-    public void Step() {
+    public bool Step() {
 
 		//Execute the current line
 		ExecuteLine( (int) GetRegisterValue( "PC" ) );
