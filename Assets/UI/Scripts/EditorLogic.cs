@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +9,10 @@ public class EditorLogic : MonoBehaviour {
 	//Buttons
     public Button stepButton;
 	public Button execButton;
+	public Button playButton;
 
 	//The text area containing code
-	public InputField codeArea;
+	public TMP_InputField codeArea;
 
     //A reference to the device we're currently editing code for
     public Controllable currentDevice;
@@ -18,12 +20,16 @@ public class EditorLogic : MonoBehaviour {
 	//Tracks if the exec button should act as a stop button
 	private bool execButtonIsStop = false;
 
+	//Main game logic
+	public MainLogic mainLogic;
+
     // Start is called before the first frame update
     void Start() {
 
 		//Set up event handlers
 		stepButton.onClick.AddListener( StepButtonHandler );
 		execButton.onClick.AddListener( ExecButtonHandler );
+		playButton.onClick.AddListener( PlayButtonHandler );
 
 		//Disable the step button
 		stepButton.interactable = false;
@@ -52,7 +58,7 @@ public class EditorLogic : MonoBehaviour {
 		execButtonIsStop = false;
 
 		//Change button text
-		execButton.GetComponentInChildren<Text>().text = "EXEC";
+		execButton.GetComponentInChildren<Text>().text = "Execute";
 	}
 
 	//Prepares the editor to execute code
@@ -63,8 +69,8 @@ public class EditorLogic : MonoBehaviour {
 		//Disable editing code
 		codeArea.interactable = false;
 
-		//Tell the device to get ready to execute
-		currentDevice.GetReadyToExecute();
+		//Tell main logic to get ready to execute
+		mainLogic.GetReadyToExecute();
 
 		//Enable the step button
 		stepButton.interactable = true;
@@ -73,7 +79,7 @@ public class EditorLogic : MonoBehaviour {
 		execButtonIsStop = true;
 
 		//Change button text
-		execButton.GetComponentInChildren<Text>().text = "STOP";
+		execButton.GetComponentInChildren<Text>().text = "Stop";
 	}
 
 	public void ExecButtonHandler() {
@@ -85,4 +91,12 @@ public class EditorLogic : MonoBehaviour {
 			SwitchToExecutionMode();
 		}
 	}
+
+	public void PlayButtonHandler() {
+
+		//Being playing the code on main game logic
+		mainLogic.Play();
+
+	}
+
 }

@@ -21,13 +21,19 @@ public abstract class Controllable : MonoBehaviour {
 	protected Dictionary<string, int> labels = new Dictionary<string, int>();
 
 	//This device's code
-	private string code = "";
+	protected string code = "";
 
     //The number of general registers to generate
     protected int generalRegisterCount = 4;
 
+	//Tracks whether or not we ran into a problem
+	private bool halt = false;
+
     // Start is called before the first frame update
     public void Start() {
+
+		//Add ourselves to main logic's controllables list
+		GameObject.Find( "GameLogic" ).GetComponent<MainLogic>().controllables.Add( this );
 
         //Set up general registers
         for( int i = 0; i < generalRegisterCount; i++ ) {
@@ -36,6 +42,11 @@ public abstract class Controllable : MonoBehaviour {
 
 		//Reset all registers
 		ResetAllRegisters();
+
+		//If this has an AI script on it, load our code from that
+		if( this.GetComponent<AI>() ) {
+			SetCode( this.GetComponent<AI>().AICode );
+		}
 
 	}
 
@@ -143,11 +154,8 @@ public abstract class Controllable : MonoBehaviour {
 
 	//Stops execution
 	public void Halt() {
-
-		//Find the editor and stop it from continuing by switching to edit mode
-		//This is not a great way to do this.
-		GameObject.Find( "Editor Panel" ).GetComponent<EditorLogic>().SwitchToEditMode();
-
+		//Mark down that we ran into a halting error
+		halt = true;
 	}
 
 	//Returns the number of lines in the code
@@ -515,6 +523,9 @@ public abstract class Controllable : MonoBehaviour {
 
 		//Move to the next line
 		IncrementProgramCounter();
+
+		//Return whether or not we had a halting issue somewhere in stepping
+		return halt;
 	}
 
 	//Returns whether or not a register exists
